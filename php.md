@@ -137,9 +137,188 @@
 
 >psr-2 要求
 
+1. 贯彻psr-1 使用psr-2 必须贯彻psr-1
+2. 缩进 psr-2 推荐 PHP代码使用四个空格缩进
+3. 文件和代码行 PHP文件必须使用unix 风格的换行符(lf) ,最后有一个空行,而且不能使用PHP关闭标签?> 每行代码不能超过80个字符.每行末不能有空格
+4. 关键字 PHP关键字必须要用小写字母
+5. 命名空间 每个命名空间声明语句后必须跟着一个空行.在一系类use声明语句后加一个空行
+6. 类 psr-2 类的定义的起始括号应该在类名之后新起一行 ,extends和implements 关键字必须和类名写在一行
+7. 方法 方法定义的起始括号要在方法名之后新起一行写,起始圆号之后没有空格,结束圆括号之前也没有空格.方法的每个参数后面有一个逗号和空格
+8. 可见性 类中的每个属性和方法都要声明可见性.可见性由public protected private 指定
+9. 控制结构 所有控制结构关键字后面都要有一个空格.控制结构关键字包括: if ... 
+
+
+
+> todo 
+
+##### psr-3 日志记录器接口
 
 
 
 
 
+
+#### 组件
+
+> https://packagist.org
+
+
+
+
+> htmlentites() 过滤特殊的HTML字符
+
+> filter_var filter_input 验证的组件有: aura/filter  respect/validation symfony/validator
+##### 安全
+
+1. SQL 注入 解决方案 : 1. 使用预处理语句  2 
+
+
+##### 密码 
+哈希算法 md5 sha1 bcrypt  scrypt
+
+##### 时间,日期和时区
+
+1. 设置默认时区 date.timezone = "America/New_York"
+2. 设置默认时区 date_default_timezone_set("PRC")
+3. DateTime 提供了一个面向对象的接口,用于管理日期和时间.
+4. DateInterval 实例表示长度固定的时间段
+5. DateTimeZone 表示时区
+6. DatePeriod 一个DateTime 实例 表示迭代开始的时间 一个 DateInterval 表示下一个时期和时间的间隔 一个整数 表示迭代的总次数
+
+
+
+#### 数据库
+
+##### pdo扩展
+
+###### 连接
+* dsn 数据库驱动的名称 主机或者ip地址 端口号 数据库名称 字符集 
+
+* $pdo = new PDO('mysql:host=127.0.1;dbname=kevin;port=3306;charset=utf8',username,password);
+
+###### 预处理语句
+
+>$pdo -> prepare(sql) $pdo->bindValue(':id',$id,PDO::PARAM_INT) //绑定参数 第三个参数绑定参数的数据类型
+
+##### 查询结果
+> $statement ->execute()
+* fetch() fetchAll()
+1. PDO::FETCH_ASSOC 让fetch() 和fetchAll()返回一个关联数组.数组的键值对应数据库列名
+2. PDO::FETCH_NUM 返回一个键为数字的数组.数组的键鱼数据库列在查询结果中的索引
+3. PDO::FETCH_BOTH返回一个即有数字又有关联数组
+4. PDO::OBJ 返回一个对象 对象的属性是数据库的列名
+
+
+#####事务 
+
+> $pdo ->beginTransaction()
+
+
+
+
+#### 流 
+
+>定义 : 流的作用是在出发地和目的地之间传输数据.出发地和目的地可以是文件.命令行进程.网络连接.zip或tar压缩文件.临时内存.标准的输入输出,或者PHP流协议封装的实现的任何其它资源
+
+
+
+
+
+#### php-fpm 配置
+
+##### 全局配置
+
+
+ * emergency_restart_threshold =10 在指定的一段时间内.如果失效的php-fpm子进程数超过这个值,php-fpm住进程就会重启
+ * emergency_restart_interval =1m 设定emergency_restart_threshold 设置采用的时间跨度
+
+
+ ##### 配置进程池
+ * user = root 拥有这个php-fpm进程池子进程的系统用户
+ * group =root 子进程中用户组
+ * listen = 127.0.0.1:9000 php-fpm 进程池监听的ip地址和端口号
+ * listen.allowed_client = 127.0.0.1  可以向这个php-fpm 进程池发送请求的ip地址
+ * pm.max_children=51 设定php-fpm 进程池中最多有多少个进程
+ * pm.start_servers =3 php-fpm 启动时php-fpm 进程池中立即可用的进程数
+ * pm.min_spare_servers =2 php-fpm 空闲时的进程数量最小值
+ * pm.max_spare_servers =10 php-fpm 空闲时最多的进程数量
+ * pm.max_requests =1000 php-fpm 进程池中各个进程最多能处理的http请求数量.这个设置有助于避免php扩展或库因编写拙劣导致不断内存泄漏
+ * slowlog = /log/php-fpm.log 设置日志文件在系统的绝对路径
+ * request_slowlog_timeout=5 当前http请求的处理时间超过指定的值,就把请求的回溯信息写入slowlog 设置指定的日志文件
+
+
+
+ #### 调优
+
+ ##### php.ini 文件
+
+ * 设置单个php进程可以使用内存的最大值 memory_limit 
+
+ * zend opcache 
+```
+opcache.memory_consumption =64
+opcache.interned_string_buffer =16
+opcache.max_accelerated_files = 4000
+opcache.validate_timestamps = 1
+opcache.revalidate_freq =0
+opcache.fast_shutdown =1
+
+```
+ 1. opcache.memory_consumption =64 为操作码缓存分配的内存量(单位兆mb)
+ 2. opcache.interned_strings_buffer =16 用来储z驻留字符串的内存量
+ 3. opcache.max_acelerated_files =4000 操作码缓存中最多能存储多少个PHP脚本
+ 4. opcache.valiate_timestamps =1 这个值表示经过一段时间后PHP会检查PHP脚本的内容是否有变化.检查变化的时间间隔由opcache.revaliate_freq =0 .如果设置为0 PHP不会检查PHP脚本内容是否变化,我们必须自己动手清除缓存的操作码
+ 5. opcache.revaliate_freq =0 设置多久检查一次PHP脚本内容是否有变化
+ 6. opcache.fast_shutdown =1 设置让操作码使用更快的停机步骤,把对象析构和内存释放交给zend engine 内存管理器完成
+
+
+ ##### 文件上传
+ * file_uploads =1 
+ * upload_max_filesize =10 最大上传大小
+ * max_file_uploads =3 最大上传数目
+ > 设置最大上传大小的时候还要考虑NGINX client_max_body_size 设置
+
+
+ ##### 最长执行时间
+ 
+ * max_execution_time =5 单位s
+
+
+
+
+####xdebug
+
+> xdebug 是最流行的php分析器,使用它分析应用的调用栈,能轻易找到瓶颈和性能问题
+
+##### 配置
+1. xdebug.profiler_enable=0 这个设置为了让xdebug 不能自动运行
+2. xdebug.profiler_enable_trigger=1 这个设置为了在需要的时候启动xdebug
+3. xdebug.profiler_output_dir = xxx 这是一个目录路径,这个目录保存分析器生成的报告
+
+
+#### xhpof
+
+> xhpof 是facebook 开发,在开发环境和生产环境中能适应,xhpof 收集的信息没有xdebug多,不过消耗系统资源较少
+
+
+#### HHVM
+
+
+
+
+#### 面向对象编程
+
+* oop 术语 (Object Oriented Programming)
+
+1. class 创建对象的方法或蓝图
+2. object 实例
+3. instantiate 从类创建对象的动作
+4. method 属于对象的函数
+5. property 属于对象的变量
+
+* 类的构造
+
+__construct 构造函数  对象实例化会初始化该函数
+
+__destructor 析构函数 对象销毁会调用该函数
 
