@@ -64,6 +64,13 @@
     Elasticsearch 的文档包含了已Json的键值对方式组织的多个字段，字段可以是对象类型、数组类型或者核心数据类型。类型与表对应，文档与行对应，字段与列对应。字段的值也就自然地与表中的某行某列的数据单元对应
 ```
 
+##### 节点(node)
+
+```
+    单个elsasticsearch 服务实例称为node 
+
+```
+
 
 
 #### Elasticsearch 的CRUD (增删改查)
@@ -178,6 +185,54 @@ curl -XPUT http://....com /_mapping -d '{
         }
      }'
 ```
+
+
+
+##### 查询数据
+1. 使用各种查询类型 (简单的词项查询,短语查询,范围查询,布尔查询,模糊查询,区间查询,通配符查询,空间查询)
+2. 组合简单查询构建复杂查询
+3. 文档过滤,在不影响评分的前提下抛弃哪些不满足特定查询条件的文档
+4. 查找与特定文档相似的文档
+5. 查找特定短语的查询建议与拼写检查
+6. 使用切面构建动态导航和计算各种统计量
+7. 使用预搜索并查找与指定文档匹配的query集合
+
+
+
+
+
+##### 倒序索引
+
+```
+    被用来存储在全文搜索下某个单词在一个文档或者一组文档中的存储位置的映射
+
+
+```
+
+
+#### es 配置
+
+1. cluster.name: kevin 配置es 的集群名称
+2. node.name :  配置es 节点名称
+3. node.master: true 是否为master 节点
+4. node.data: true 指定该节点是否存储索引数据
+5. index.number_of_shards : 5 设置默认索引分片个数
+6. index.number_of_replicas 设置默认索引副本个数
+7. path.data:  xxx/xxx 设置索引数据存储路径
+8. path.logs: xxx/xxx 设置日志文件存储路径
+9. bootstrap.mlockall: true 设置为true 来锁住内存.因为jvm开始swapping时es 的效率会降低,所以要保证它不swap,可以把ES_MIN_MEM和ES_MAX_MEM两个环境变量设置为同一个值,并且保证机器有足够的内存分配给es
+10. network.host: 192.168.0.1 设置绑定的ip地址 默认0.0.0.0(全部访问)
+11. http.port: 9200 设置对外服务的http端口
+12. transport.tcp.port : 9300 设置节点间的tcp端口也是Java api 使用的端口
+13. transport.tcp.compress: true 是否压缩tcp传输 默认不压缩
+14. http.max_content_length: 100mb 设置内容的最大容量
+15. http.cors.enabled:false 是否使用http 协议对外提供服务 默认为true
+16. discover.zen.minimum_master_nodes:1 设置这个参数来保证集群中的节点知道其他n个有master资格的节点
+17. dicover.zen.ping.timeout: 设置集群中自动发现其他节点时ping
+连接超时时间
+18. discover.zen.ping.multicast.enabled:false 设置是否打开多播发现节点
+19. discover.zen.ping.unicast.hosts:[] [] [] 设置集群中master 节点的初始列表 
+20. script.engine.groovy.inline.update:on 开启groovy  脚本支持,inline 表示脚本的来源为内嵌式
 
 
 
